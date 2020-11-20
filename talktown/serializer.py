@@ -28,6 +28,7 @@ def serialize(sim: Simulation):
     output['weather'] = sim.weather
     output['last_simulated_day'] = sim.last_simulated_day
     output['n_simulated_timesteps'] = sim.n_simulated_timesteps
+    output['stories'] = serialize_stories(sim.story_recognizer)
 
     return json.dumps(output)
 
@@ -36,6 +37,78 @@ def serialize_to_file(sim: Simulation, filename: pathlib.Path):
     json_str = serialize(sim)
     with open(filename, "w") as f:
         f.write(json_str)
+
+def serialize_stories(story_recognizer):
+    """Serialize stories captured by the StoryRecognizer"""
+    output = {
+        'unrequited_love': [],
+        'love_triangles': [],
+        'extramarital_romantic_interests': [],
+        'asymmetric_friendships': [],
+        'misanthropes': [],
+        'rivalries': [],
+        'sibling_rivalries': [],
+        'business_owner_rivalries': []
+    }
+
+    for case in story_recognizer.unrequited_love_cases:
+        case_data = {
+            'lover': case.lover.id,
+            'nonreciprocator': case.nonreciprocator.id
+        }
+        output['unrequited_love'].append(case_data)
+
+    for case in story_recognizer.love_triangles:
+        case_data = {
+            'first_person': case.first_person.id,
+            'second_person': case.second_person.id,
+            'third_person': case.third_person.id
+        }
+        output['love_triangles'].append(case_data)
+
+    for case in story_recognizer.extramarital_romantic_interests:
+        case_data = {
+            'married_person': case.married_person.id,
+            'love_interest': case.love_interest.id
+        }
+        output['extramarital_romantic_interests'].append(case_data)
+
+    for case in story_recognizer.asymmetric_friendships:
+        case_data = {
+            'friend': case.friend.id,
+            'enemy': case.enemy.id
+        }
+        output['asymmetric_friendships'].append(case_data)
+
+    for case in story_recognizer.misanthropes:
+        case_data = {
+            'misanthrope': case.misanthrope.id
+        }
+        output['misanthropes'].append(case_data)
+
+    for case in story_recognizer.rivalries:
+        case_data = {
+            'first_person': case.subjects[0].id,
+            'second_person': case.subjects[1].id
+        }
+        output['rivalries'].append(case_data)
+
+    for case in story_recognizer.sibling_rivalries:
+        case_data = {
+            'first_person': case.subjects[0].id,
+            'second_person': case.subjects[1].id
+        }
+        output['sibling_rivalries'].append(case_data)
+
+    for case in story_recognizer.business_owner_rivalries:
+        case_data = {
+            'subjects': [p.id for p in case.subjects],
+            'companies': [c.id for c in case.companies],
+            'industry': case.industry
+        }
+        output['business_owner_rivalries'].append(case_data)
+
+    return output
 
 def serialize_town(town):
     """Serialize Talk of the Town town"""
