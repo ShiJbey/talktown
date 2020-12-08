@@ -1947,7 +1947,7 @@ class Person:
         # TODO EXPLORE WHY SOME PEOPLE ARE INDEXING OTHERS WITH
         # NEGATIVE SALIENCE VALUES -- the max() is duct tape right now
         self.salience_of_other_people[entity] = (
-            max(0.0, self.salience_of_other_people.get(entity, 0.0) + change)
+            min(max(0.0, self.salience_of_other_people.get(entity, 0.0) + change), 100.0)
         )
 
     def connection_to_place(self):
